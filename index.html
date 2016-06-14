@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>MXR</title>
+        <!--
+            http://codepen.io/blucube/pen/cudAz
+            http://kaisarcode.com/javascript-rotate-dial
+            http://stackoverflow.com/questions/2676719/calculating-the-angle-between-the-line-defined-by-two-points
+            https://www.raywenderlich.com/9864/how-to-create-a-rotating-wheel-control-with-uikit
+            http://www.mathwarehouse.com/algebra/distance_formula/index.php
+            http://www.soultravelmultimedia.com/2013/05/11/40-outstanding-user-interface-knobs/
+        -->
+        <!-- <link rel="shortcut icon" href="https://myaccount.hetzner.co.za/favicon.ico" type="image/x-icon" /> -->
+        <link rel="shortcut icon" href="http://vouchercruncher.co.uk/wp-content/themes/clipper/images/favicon.ico" type="image/x-icon" />
+        <link rel="stylesheet" type="text/css" href="css/normal.css" />
+        <style type="text/css">
+            * {
+                padding: 0;
+                margin: 0;
+            }
+            body {
+                background-color: #ffffff;
+                font-size: 100%;
+                font-family: Arial;
+                color: #404040;
+            }
+            #launcher {
+                border: solid 1px #c0c0c0;
+                padding: 4px 8px;
+            }
+            div.curtain {
+                background: rgba(0, 0, 0, 0.5);
+                bottom: 0;
+                box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+                display: none;
+                left: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+            div.curtain:before {
+                content: " ";
+                display: block;
+                height: 50%;
+            }
+            #mxr {
+                background: #ffffff;
+                border: solid 1px #404040;
+                margin: 0 auto;
+                max-width: 640px;
+            }
+            #mxr div.top-bar {
+                background: #f0f0f0;
+                padding: 2px;
+            }
+            #mxr:after,
+            #mxr div.top-bar:after {
+                content: " ";
+                clear: both;
+                display: block;
+                font-size: 0;
+                height: 0;
+                line-height: 0;
+                overflow: hidden;
+                visibility: hidden;
+            }
+            #mxr div.top-bar span.title {
+                display: block;
+                float: left;
+                font-size: 12px;
+                height: 18px;
+                line-height: 18px;
+                margin-left: 2px;
+                text-transform: uppercase;
+            }
+            #mxr div.top-bar button.close {
+                background: #f0f0f0;
+                border: solid 1px #c0c0c0;
+                border-radius: 10%;
+                box-sizing: content-box;
+                cursor: pointer;
+                display: block;
+                float: right;
+                height: 16px;
+                overflow: hidden;
+                text-indent: -999999em;
+                width: 16px;
+            }
+            #mxr div.top-bar button.close:before {
+                background: url(images/close.svg) no-repeat center center;
+                content: " ";
+                display: block;
+                height: 16px;
+                opacity: 0.75;
+                width: 16px;
+            }
+            #mxr div.content {
+                float: left;
+                padding: 10px;
+            }
+            #mxr div.content table {
+                border: solid 1px #e0e0e0;
+            }
+            #mxr div.content table th,
+            #mxr div.content table td {
+                border: dotted 1px #e0e0e0;
+                font-weight: normal;
+            }
+            #mxr div.content table td {
+                font-size: 4px;
+            }
+            #mxr .control-knob {
+                font-size: 1em;
+                margin: 10px;
+                opacity: 0.25;
+            }
+            #mxr .control-knob.disabled {
+                opacity: 0.1 !important;
+            }
+        </style>
+        <!-- <script type="text/javascript" src="lib/jquery-1.12.4.min.js"></script> -->
+        <script type="text/javascript" src="lib/jquery-3.0.0.min.js"></script>
+        <script type="text/javascript" src="lib/jquery.domxy.js"></script>
+        <script type="text/javascript" src="lib/jquery.mousewheel.min.js"></script>
+        <script type="text/javascript" src="lib/jquery-control-knob.js"></script>
+        <script type="text/javascript">
+            (function (window, $) {
+                "use strict";
+                var $document = $(document);
+                $document.ready(function () {
+                    var $curtain = $('div.curtain'),
+                        $mxr = $('#mxr'),
+                        $close = $mxr.find('button.close'),
+                        $content = $mxr.find('div.content'),
+                        fade_speed = 100;
+                    $('#launcher').on('click', function (event) {
+                        event.preventDefault();
+                        $curtain.css('opacity', 0).show();
+                        //console.log($mxr.outerHeight());
+                        $mxr.css('margin-top', -($mxr.outerHeight() / 2)).width($content.outerWidth());
+                        $curtain.fadeTo(fade_speed, 1);
+                    });
+                    $close.on('mousedown click', function (event) {
+                        event.preventDefault(); // prevents element focus on mousedown
+                        switch (event.type) {
+                        case 'click':
+                            $curtain.fadeOut(fade_speed);
+                            break;
+                        }
+                    });
+                    (function () {
+                        var ck_options = { min: 0, max: 100, value: 0, showLabels: false, showBands: false, showValue: false },
+                            snap_length,
+                            k,
+                            len,
+                            number_of_gains = 1,
+                            max_cell = 8,
+                            cell_count,
+                            table = document.createElement('table'),
+                            tr_1,
+                            tr_2,
+                            th,
+                            td,
+                            handler = function (event, value) {
+                                console.log('EVENT: ' + event.type + ', VALUE: ' + value);
+                            };
+                        $content.text('');
+                        table.setAttribute('cellpadding', '0');
+                        table.setAttribute('cellspacing', '0');
+                        tr_1 = document.createElement('tr');
+                        th = document.createElement('th');
+                        th.setAttribute('colspan', max_cell);
+                        th.textContent = 'GROUP 1';
+                        tr_1.appendChild(th);
+                        table.appendChild(tr_1);
+                        cell_count = 0;
+                        // SNAP -> http://stackoverflow.com/questions/5421566/how-do-i-implement-snap-to-grid-functionality-for-a-uiimageview
+                        snap_length = Math.ceil(number_of_gains / max_cell) * max_cell;
+                        while (cell_count < snap_length) {
+                            tr_1 = document.createElement('tr');
+                            tr_2 = document.createElement('tr');
+                            for (k = 0, len = max_cell; k < len; k += 1) {
+                                th = document.createElement('th');
+                                td = document.createElement('td');
+                                if (cell_count < number_of_gains) {
+                                    th.textContent = cell_count + 1;
+                                    $.createControlKnob(ck_options).attachTo(td).on('input change', handler);
+                                } else {
+                                    th.textContent = 'N\/A';
+                                    $.createControlKnob(ck_options).attachTo(td).on('input change', handler).disable();
+                                }
+                                tr_1.appendChild(th);
+                                tr_2.appendChild(td);
+                                cell_count += 1;
+                            }
+                            table.appendChild(tr_1);
+                            table.appendChild(tr_2);
+                            //$.createControlKnob(ck_options).attachTo($content).on('input change', handler);
+                        }
+                        $content.append(table);
+                    }());
+                });
+            }(window, (typeof jQuery === "function" && jQuery) || require('jquery')));
+        </script>
+    </head>
+    <body>
+        <!-- Template by Jaycliff Arcilla -->
+        <button id="launcher">Launch</button>
+        <div class="curtain">
+            <div id="mxr">
+                <div class="top-bar">
+                    <span class="title">MXR</span>
+                    <button class="close">CLOSE</button>
+                </div>
+                <div class="content">
+                    Some random content...
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

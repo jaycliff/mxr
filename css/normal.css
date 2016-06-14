@@ -1,0 +1,147 @@
+.control-knob {
+    display: inline-block;
+    font-size: 12px;
+    position: relative;
+    background-color: #e8e8e8;
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    /* border: solid 0.25em #e4e4e4; */
+    /* border: solid 0.25em #c0c0c0; */
+    margin: 4em;
+    background: #f0f0f0;
+    box-shadow: 0 0.2em 0.1em 0.05em rgba(255, 255, 255, 0.1) inset, 0 -0.2em 0.1em 0.05em rgba(0, 0, 0, 0.1) inset, 0 0.5em 0.65em 0 rgba(0, 0, 0, 0.1);
+}
+.control-knob.disabled {
+    opacity: 0.5 !important;
+}
+.control-knob .ck-anchor {
+    bottom: 0;
+    display: block;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.control-knob .ck-handle {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+    z-index: 10;
+    transition: transform 180ms ease-out;
+}
+.control-knob .ck-decal {
+    display: block;
+    height: 100%;
+    position: relative;
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    width: 100%;
+}
+.control-knob .ck-decal:before {
+    content: " ";
+    display: block;
+    height: 50%;
+    width: 100%;
+}
+.control-knob .ck-decal:after {
+    background-color: #bfbfbf;
+    border-radius: 2px;
+    box-shadow: 0 0 0.2em 0 rgba(0, 0, 0, 0.2);
+    /*
+    -moz-box-shadow: 0 0 0.4em 0 #79c3f4;
+    -ms-box-shadow: 0 0 0.4em 0 #79c3f4;
+    -o-box-shadow: 0 0 0.4em 0 #79c3f4;
+    -webkit-box-shadow: 0 0 0.4em 0 #79c3f4;
+    box-shadow: 0 0 0.4em 0 #79c3f4;
+    */
+    content: " ";
+    display: block;
+    height: 3%;
+    margin-left: 2%;
+    margin-top: -1.5%;
+    width: 10%;
+}
+.control-knob .ck-value {
+    display: block;
+    color: #808080;
+    font-family: Arial;
+    font-size: 1em;
+    height: 20px;
+    left: 50%;
+    line-height: 20px;
+    margin: -10px 0 0 -50px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 100px;
+}
+.control-knob .ck-min-label,
+.control-knob .ck-max-label {
+    display: block;
+    font-family: "Arial", sans-serif;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    -webkit-font-smoothing: antialiased;
+    font-size: 70%;
+    position: absolute;
+    opacity: 1;
+    pointer-events: none;
+}
+.control-knob .ck-min-label {
+    bottom: 1em;
+    left: -3.5em;
+}
+.control-knob .ck-max-label {
+    bottom: 1em;
+    right: -3.5em;
+}
+.control-knob .ck-bands-wrap {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+.control-knob .ck-band {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    overflow: visible;
+}
+.control-knob .ck-band:after {
+    display: block;
+    border-radius: 12%;
+    content: " ";
+    width: 0.4em;
+    height: 0.4em;
+    background-color: rgba(0, 0, 0, 0.1);
+    position: absolute;
+    left: -0.8em;
+    top: 50%;
+    margin-top: -0.2em;
+    -webkit-transition: all 180ms ease-out;
+    -moz-transition: all 180ms ease-out;
+    -o-transition: all 180ms ease-out;
+    transition: all 180ms ease-out;
+}
+.control-knob .active:after {
+    background-color: red;
+    -webkit-transition: all 50ms ease-in;
+    -moz-transition: all 50ms ease-in;
+    -o-transition: all 50ms ease-in;
+    transition: all 50ms ease-in;
+}
