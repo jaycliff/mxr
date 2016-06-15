@@ -1,28 +1,39 @@
 .control-knob {
     display: inline-block;
     font-size: 12px;
+    overflow: hidden;
+    padding: 1.5em;
     position: relative;
-    background-color: #e8e8e8;
-    width: 10em;
     height: 10em;
-    border-radius: 50%;
-    /* border: solid 0.25em #e4e4e4; */
-    /* border: solid 0.25em #c0c0c0; */
-    margin: 4em;
-    background: #f0f0f0;
-    box-shadow: 0 0.2em 0.1em 0.05em rgba(255, 255, 255, 0.1) inset, 0 -0.2em 0.1em 0.05em rgba(0, 0, 0, 0.1) inset, 0 0.5em 0.65em 0 rgba(0, 0, 0, 0.1);
+    width: 10em;
 }
 .control-knob.disabled {
     opacity: 0.5 !important;
 }
+.control-knob .ck-subwrap {
+    background-color: #e8e8e8;
+    display: block;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    /* border: solid 0.25em #e4e4e4; */
+    /* border: solid 0.25em #c0c0c0; */
+    background: #f0f0f0;
+    box-shadow: 0 0.2em 0.1em 0.05em rgba(255, 255, 255, 0.1) inset, 0 -0.2em 0.1em 0.05em rgba(0, 0, 0, 0.1) inset, 0 0.5em 0.65em 0 rgba(0, 0, 0, 0.1);
+}
 .control-knob .ck-anchor {
     bottom: 0;
+    cursor: pointer;
     display: block;
     left: 0;
     overflow: hidden;
     position: absolute;
     right: 0;
     top: 0;
+}
+.control-knob.disabled .ck-anchor {
+    cursor: default;
 }
 .control-knob .ck-handle {
     display: block;
@@ -35,8 +46,7 @@
     -o-transform: rotate(0deg);
     -ms-transform: rotate(0deg);
     transform: rotate(0deg);
-    z-index: 10;
-    transition: transform 180ms ease-out;
+    transition: transform 50ms ease-in;
 }
 .control-knob .ck-decal {
     display: block;
@@ -87,8 +97,16 @@
     top: 50%;
     width: 100px;
 }
+.control-knob .ck-label-wrap {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: auto;
+}
 .control-knob .ck-min-label,
 .control-knob .ck-max-label {
+    bottom: -0.25em;
     display: block;
     font-family: "Arial", sans-serif;
     color: rgba(0, 0, 0, 0.5);
@@ -100,12 +118,10 @@
     pointer-events: none;
 }
 .control-knob .ck-min-label {
-    bottom: 1em;
-    left: -3.5em;
+    left: -1.5em;
 }
 .control-knob .ck-max-label {
-    bottom: 1em;
-    right: -3.5em;
+    right: -1.5em;
 }
 .control-knob .ck-bands-wrap {
     display: block;
@@ -119,7 +135,6 @@
     height: 100%;
     top: 0;
     left: 0;
-    z-index: 5;
     overflow: visible;
 }
 .control-knob .ck-band:after {
@@ -139,7 +154,7 @@
     transition: all 180ms ease-out;
 }
 .control-knob .active:after {
-    background-color: red;
+    background-color: rgba(255, 0, 0, 0.5);
     -webkit-transition: all 50ms ease-in;
     -moz-transition: all 50ms ease-in;
     -o-transition: all 50ms ease-in;

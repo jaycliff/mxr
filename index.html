@@ -104,8 +104,14 @@
             }
             #mxr div.content table th,
             #mxr div.content table td {
-                border: dotted 1px #e0e0e0;
+                border: solid 1px #e0e0e0;
                 font-weight: normal;
+            }
+            #mxr div.content table th {
+                font-size: 10px;
+            }
+            #mxr div.content table th[colspan] {
+                font-size: 12px;
             }
             #mxr div.content table td {
                 font-size: 4px;
@@ -141,11 +147,14 @@
                         $mxr.css('margin-top', -($mxr.outerHeight() / 2)).width($content.outerWidth());
                         $curtain.fadeTo(fade_speed, 1);
                     });
+                    function resetMXR() {
+                        $mxr.removeAttr('style');
+                    }
                     $close.on('mousedown click', function (event) {
                         event.preventDefault(); // prevents element focus on mousedown
                         switch (event.type) {
                         case 'click':
-                            $curtain.fadeOut(fade_speed);
+                            $curtain.fadeOut(fade_speed, resetMXR);
                             break;
                         }
                     });
@@ -154,7 +163,7 @@
                             snap_length,
                             k,
                             len,
-                            number_of_gains = 1,
+                            number_of_gains = 30,
                             max_cell = 8,
                             cell_count,
                             table = document.createElement('table'),
