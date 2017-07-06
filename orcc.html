@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+        <title>ORCC</title>
+<!--
+?key=AIzaSyCfUN69Lq0FygKpXvDDKTrHLXY8FQAstYA
+
+http://onerent.co/api/Property/availableProperties
+
+fortheanswer
+-->
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
+        <style type="text/css">
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html, body {
+                background-color: #f7fff4;
+            }
+            .overflow-hidden {
+                overflow: hidden !important;
+            }
+            #curtain {
+                background-color: #ffffff;
+                bottom: 0;
+                left: 0;
+                position: fixed;
+                right: 0;
+                top: 0;
+                z-index: 999;
+            }
+            #curtain:after {
+                background-color: rgba(255, 255, 255, 0.2);
+                bottom: 0;
+                content: ".";
+                left: 0;
+                overflow: hidden;
+                position: absolute;
+                right: 0;
+                text-indent: -999em;
+                top: 0;
+            }
+            #curtain > div.table {
+                display: table;
+                height: 100%;
+                width: 100%;
+            }
+            #curtain > div.table > div.cell {
+                color: #404040;
+                display: table-cell;
+                text-align: center;
+                text-transform: uppercase;
+                vertical-align: middle;
+            }
+            #wrapper {
+                padding: 10px 0;
+            }
+            #property-listings {
+                list-style: none;
+                margin: 0;
+            }
+            #property-listings > li {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                margin-top: 10px;
+            }
+            #property-listings > li:first-child {
+                margin-top: 0;
+            }
+            div.property {
+                background-color: #ffffff;
+                cursor: pointer;
+                display: table;
+                transition: background-color 0.1s;
+                width: 100%;
+            }
+            div.property:hover,
+            div.property:active {
+                /* background-color: #fafafa; */
+                outline: solid 2px green; 
+            }
+            div.property.selected {
+                background-color: #e8ffdf;
+            }
+            div.property > * {
+                display: table-cell;
+                vertical-align: middle;
+            }
+            div.property > div.preview {
+                overflow: hidden;
+                position: relative;
+                width: 10%;
+            }
+            div.property > div.preview > img {
+                display: block;
+                transition: transform 0.1s;
+            }
+            div.property > div.preview:after {
+                bottom: 0;
+                box-shadow: inset 0 0 20px white;
+                content: ".";
+                left: 0;
+                opacity: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+                transition: opacity 0.1s;
+            }
+            div.property.selected > div.preview > img,
+            div.property:hover > div.preview > img,
+            div.property:active > div.preview > img {
+                transform: scale(1.1);
+            }
+            div.property.selected > div.preview:after,
+            div.property:hover > div.preview:after,
+            div.property:active > div.preview:after {
+                opacity: 1;
+            }
+            div.property > div.description {
+                padding: 0 10px;
+            }
+            div.property > div.description div.address {
+                border-bottom: solid 1px #e0e0e0;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 4px;
+                padding-bottom: 4px;
+            }
+            div.property > div.description div.type {
+                color: #808080;
+                font-size: 12px;
+            }
+            div.property > div.description div.rent-price {
+                color: green;
+            }
+            /* GPU OPTIMIZATION */
+            #curtain {
+                transform: translateZ(0);
+                will-change: opacity;
+            }
+        </style>
+        <script type="text/javascript" src="jquery-3.0.0.min.js"></script>
+        <script type="text/javascript">
+            if (typeof module === "object" && typeof module.exports === "function") {
+                // set jQuery in `module`
+                window.jQuery = module.exports;
+                window.$ = module.exports;
+            }
+        </script>
+        <script src="js/bootstrap.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            (function oneRentCodingChallengeByTheCliffmeister() {
+                "use strict";
+                var HOST_ENVIRONMENT = (typeof window.process === "object" && typeof window.process.versions === "object") ? (window.process.versions['electron']) ? 'ELECTRON' : (window.process.versions['nwjs']) ? 'NWJS' : 'UNKNOWN NODE-BASED HOST' : 'BROWSER',
+                    HOST_UTILITIES = null,
+                    PROPERTY_DATA = null,
+                    LOAD_SEQUENCE,
+                    $document = jQuery(document),
+                    hasOwnProperty = Object.prototype.hasOwnProperty;
+                LOAD_SEQUENCE = (function () {
+                    var list_of_callbacks = [], callback, checklist = {
+                        'document-load': false,
+                        'property-listing-load': false
+                    };
+                    function isListComplete(current_key) {
+                        var key;
+                        for (key in checklist) {
+                            if (current_key !== key && hasOwnProperty.call(checklist, key)) {
+                                if (!checklist[key]) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    return {
+                        tick: function tick(requirement) {
+                            var k, len, callback;
+                            if (hasOwnProperty.call(checklist, requirement)) {
+                                checklist[requirement] = true;
+                                if (isListComplete(requirement)) {
+                                    for (k = 0, len = list_of_callbacks.length; k < len; k += 1) {
+                                        callback = list_of_callbacks[k];
+                                        callback();
+                                    }
+                                }
+                            }
+                            return this;
+                        },
+                        addCallback: function addCallback(callback) {
+                            list_of_callbacks.push(callback);
+                            return this;
+                        }
+                    }
+                }());
+                switch (HOST_ENVIRONMENT) {
+                case 'ELECTRON':
+                    (function setupHostUtilities() {
+                        var remote = require('electron').remote;
+                        HOST_UTILITIES = {
+                            developerTools: {
+                                toggle: function toggle() {
+                                    remote.getCurrentWindow().toggleDevTools();
+                                },
+                                open: function open() {
+                                    remote.getCurrentWindow().openDevTools();
+                                },
+                                close: function close() {
+                                    remote.getCurrentWindow().closeDevTools();
+                                }
+                            }
+                        };
+                    }());
+                    (function fetchPropertyData() {
+                        var request, headers, options;
+                        request = require('request');
+                        // Set the headers
+                        headers = {
+                            //'User-Agent': 'Super Agent/0.0.1',
+                            'User-Agent': 'Electron/1.0.0',
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        };
+                        // Configure the request
+                        options = {
+                            url: 'https://www.onerent.co/api/Property/availableProperties',
+                            method: 'POST',
+                            //form: {'key1': 'xxx', 'key2': 'yyy'},
+                            headers: headers
+                        };
+                        // Start the request
+                        request(options, function (error, response, body) {
+                            if (!error && response.statusCode === 200) {
+                                // Print out the response body
+                                //console.log(body);
+                                PROPERTY_DATA = JSON.parse(body);
+                            } else {
+                                alert('Failed to load property listings. Shame.');
+                                PROPERTY_DATA = [];
+                            }
+                            LOAD_SEQUENCE.tick('property-listing-load');
+                        });
+                    }());
+                    break;
+                }
+                $document.ready(function ($) {
+                    var $body = $(document.body).addClass('overflow-hidden');
+                    LOAD_SEQUENCE.addCallback(function () {
+                        $('#curtain').fadeOut(250);
+                        $body.removeClass('overflow-hidden');
+                        // DEBUG
+                        window.HOST_ENVIRONMENT = HOST_ENVIRONMENT;
+                        window.HOST_UTILITIES = HOST_UTILITIES;
+                        window.PROPERTY_DATA = PROPERTY_DATA;
+                    }).tick('document-load');
+                    if (HOST_ENVIRONMENT !== 'BROWSER') {
+                        $document.on('keydown', function (event) {
+                            console.log(event.which);
+                            if (event.which === 123) {
+                                HOST_UTILITIES.developerTools.toggle();
+                            }
+                        });
+                    }
+                    $('#wrapper').on('mousedown touchstart', 'div.property', function (event) {
+                        var state = $.data(this, 'selected');
+                        event.preventDefault();
+                        if (state) {
+                            $.data(this, 'selected', false);
+                            this.classList.remove('selected');
+                        } else {
+                            $.data(this, 'selected', true);
+                            this.classList.add('selected');
+                        }
+                    });
+                });
+            }());
+        </script>
+    </head>
+    <body>
+        <div id="curtain">
+            <div class="table">
+                <div class="cell">Loading. Please wait.</div>
+            </div>
+        </div>
+        <!-- MAIN CONTENTS BELOW -->
+        <div id="wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <ul id="property-listings">
+                            <li>
+                                <div class="property">
+                                    <div class="preview">
+                                        <img src="https://res.cloudinary.com/onerent/image/upload/t_thumb/v1474040310/5596cbe26e2c8a0300af5095/yw6q4kidkpxgqoxbsx0g.jpg" alt="" width="120" height="80" />
+                                    </div>
+                                    <div class="description">
+                                        <div class="address">210 Greendale Way</div>
+                                        <div class="type">Apartment</div>
+                                        <div class="rent-price">$2,295</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="property">
+                                    <div class="preview">
+                                        <img src="https://res.cloudinary.com/onerent/image/upload/t_thumb/v1470394783/559b80a4317590030048fec9/iz5axrvrnj7ahj2iucks.jpg" alt="" width="120" height="80" />
+                                    </div>
+                                    <div class="description">
+                                        <div class="address">1839 Meridian Ave</div>
+                                        <div class="type">House</div>
+                                        <div class="rent-price">$3,290</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="property">
+                                    <div class="preview">
+                                        <img src="https://res.cloudinary.com/onerent/image/upload/t_thumb/v1444014699/55d1747a8cc3810300771d0d/sosc8qephuzmbhyd3kqm.jpg" alt="" width="120" height="80" />
+                                    </div>
+                                    <div class="description">
+                                        <div class="address">68 McCoppin St. #1</div>
+                                        <div class="type">House</div>
+                                        <div class="rent-price">$3,500</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
